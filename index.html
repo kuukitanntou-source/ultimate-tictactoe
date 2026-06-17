@@ -22,7 +22,7 @@
 
   font-family: sans-serif;
 
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
     .big-board {
@@ -54,6 +54,7 @@
       overflow: visible;
 
       isolation: isolate;
+
     }
 
     .cell {
@@ -249,6 +250,7 @@
 	  }
 
 	}
+
 	@keyframes drawVertical {
 
 	  to {
@@ -261,20 +263,64 @@
 	@keyframes drawDiagonal {
 
 	  to {
-	    width: 890px;
+	    width: 900px;
+	  }
+
+	}
+
+	@keyframes drawWinLineMobile {
+
+	  to {
+	    width: 450px;
+	  }
+
+	}
+
+	@keyframes drawVerticalMobile {
+
+	  to {
+	    height: 470px;
+	  }
+
+	}
+
+	@keyframes drawDiagonalMobile {
+
+	  to {
+	    width: 630px;
 	  }
 
 	}
 
 	@media (max-width: 768px) {
 
+ 	html,
+ 	 body {
+	margin: 0;
+	  padding: 0;
+ 	   overflow-x: hidden;
+
+ 	 }
+	
 	  .big-board {
 
 	    gap: 5px;
 
-	    transform: scale(0.63);
+	  }
 
-	    transform-origin: top center;
+	  .small-board {
+
+	    grid-template-columns:
+	      repeat(3, min(13vw, 42px));
+
+	    padding: 3px;
+
+	  }
+
+	  .cell {
+
+	    width: min(13vw, 42px);
+	    height: min(13vw, 42px);
 
 	  }
 
@@ -340,6 +386,18 @@
 
 	  }
 
+	#gameScreen {
+
+ 	 width: 100%;
+
+ 	 display: flex;
+
+ 	 flex-direction: column;
+
+ 	 align-items: center;
+
+	}
+
 	}
 
 
@@ -404,6 +462,8 @@
 	}
 
 	#gameTop {
+
+	  width: 100%;
 
 	  display: flex;
 
@@ -582,7 +642,9 @@
 	  background: rgba(0,0,0,0.7);
 
 	  justify-content: center;
-	  align-items: center;
+	  align-items: flex-start;
+
+	  padding-top: 20px;
 
 	  z-index: 9999;
 
@@ -607,15 +669,9 @@
 
 	  box-sizing: border-box;
 
-	position: fixed;
+	  position: fixed;
 
-	  left: 50%;
-	  top: 50%;
-
-	  transform:
-	    translate(-63%, -50%);
-
-	animation:
+	  animation:
 	  popupShow 0.4s ease;
 
 	}
@@ -664,19 +720,21 @@
 
 	  0% {
 
-	    transform:
-	      translate(-50%, -50%)
-	      scale(0.3);
+	    transform: scale(0.6);
 
 	    opacity: 0;
 
 	  }
 
+	  70% {
+
+	    transform: scale(1.2);
+
+	  }
+
 	  100% {
 
-	    transform:
-	      translate(-63%, -50%)
-	      scale(1);
+	    transform: scale(1);
 
 	    opacity: 1;
 
@@ -1500,95 +1558,214 @@ document
 	const line =
 	  document.createElement("div");
 
+	const boardRect =
+	  bigBoard.getBoundingClientRect();
+
+	const scaleX =
+  	  boardRect.width / 650;
+
+	const scaleY =
+	  boardRect.height / 626;
+
+	const isMobile =
+	  window.innerWidth <= 768;
+
 	line.classList.add("win-line");
 
 	// 横
 	if (a === 0 && b === 1 && c === 2) {
 
-	  line.style.top = "95px";
-	  line.style.left = "-20px";
+	  line.style.top =
+	    (90 * scaleY) + "px";
+
+	  line.style.left =
+	    (-10 * scaleX) + "px";
+
+	if (isMobile) {
+
+	  line.style.animation =
+	    "drawWinLineMobile 0.5s forwards";
+
+	} else {
+
+	  line.style.animation =
+	    "drawWinLine 0.5s forwards";
+
+	}
 
 	}
 
 	// 真ん中横
 	if (a === 3 && b === 4 && c === 5) {
 
-	  line.style.top = "305px";
-	  line.style.left = "-20px";
+	  line.style.top =
+	    (300 * scaleY) + "px";
+
+	  line.style.left =
+	    (-10 * scaleX) + "px";
+
+	if (isMobile) {
+
+	  line.style.animation =
+	    "drawWinLineMobile 0.5s forwards";
+
+	} else {
+
+	  line.style.animation =
+	    "drawWinLine 0.5s forwards";
+
+	}
 
 	}
 
 	// 下横
 	if (a === 6 && b === 7 && c === 8) {
 
-	  line.style.top = "515px";
-	  line.style.left = "-20px";
+	  line.style.top =
+	    (510 * scaleY) + "px";
 
+	  line.style.left =
+	    (-10 * scaleX) + "px";
+
+	if (isMobile) {
+
+	  line.style.animation =
+	    "drawWinLineMobile 0.5s forwards";
+
+	} else {
+
+	  line.style.animation =
+	    "drawWinLine 0.5s forwards";
+
+	}
 	}
 
 	// 左縦
 	if (a === 0 && b === 3 && c === 6) {
 
 	  line.style.width = "20px";
-	  line.style.height = "0";
+	  line.style.height = "0px";
 
-	  line.style.top = "-15px";
-	  line.style.left = "90px";
+	  line.style.top =
+	    (-20 * scaleY) + "px";
+
+	  line.style.left =
+	    (90 * scaleX) + "px";
+
+	  if (window.innerWidth <= 768) {
+
+	  line.style.animation =
+	    "drawVerticalMobile 0.5s forwards";
+
+	} else {
 
 	  line.style.animation =
 	    "drawVertical 0.5s forwards";
+
+	}
+
 	}
 
 	// 真ん中縦
 	if (a === 1 && b === 4 && c === 7) {
 
 	  line.style.width = "20px";
-	  line.style.height = "0";
+	  line.style.height = "0px";
 
-	  line.style.top = "-15px";
-	  line.style.left = "295px";
+	  line.style.top =
+	    (-20 * scaleY) + "px";
+
+	  line.style.left =
+	    (310 * scaleX) + "px";
+
+	  if (window.innerWidth <= 768) {
+
+  	line.style.animation =
+  	  "drawVerticalMobile 0.5s forwards";
+
+	} else {
 
 	  line.style.animation =
 	    "drawVertical 0.5s forwards";
+
+	}
+
 	}
 
 	// 右縦
 	if (a === 2 && b === 5 && c === 8) {
 
 	  line.style.width = "20px";
-	  line.style.height = "0";
+	  line.style.height = "0px";
 
-	  line.style.top = "-15px";
-	  line.style.left = "500px";
+	  line.style.top =
+	    (-20 * scaleY) + "px";
+
+	  line.style.left =
+	    (530 * scaleX) + "px";
+
+	  if (window.innerWidth <= 768) {
+
+	  line.style.animation =
+	    "drawVerticalMobile 0.5s forwards";
+
+	} else {
 
 	  line.style.animation =
 	    "drawVertical 0.5s forwards";
+
+	}
+
 	}
 
 	// 斜め \
 	if (a === 0 && b === 4 && c === 8) {
 
-	  line.style.left = "0px";
-	  line.style.top = "-20px";
+	  line.style.left =
+	    (-10 * scaleX) + "px";
+
+	  line.style.top =
+	    (-30 * scaleY) + "px";
 
 	  line.style.transform =
 	    "rotate(46deg)";
 
+	 if (isMobile) {
+
+	  line.style.animation =
+	    "drawDiagonalMobile 0.5s forwards";
+
+	} else {
+
 	  line.style.animation =
 	    "drawDiagonal 0.5s forwards";
+
+	}
 	}
 
 	// 斜め /
 	if (a === 2 && b === 4 && c === 6) {
 
-	  line.style.left = "610px";
-	  line.style.top = "-20px";
+	  line.style.left =
+	    (660 * scaleX) + "px";
+
+	  line.style.top =
+	    (-30 * scaleY) + "px";
 
 	  line.style.transform =
 	    "rotate(134deg)";
 
+	  if (isMobile) {
+
+	  line.style.animation =
+	    "drawDiagonalMobile 0.5s forwards";
+
+	} else {
+
 	  line.style.animation =
 	    "drawDiagonal 0.5s forwards";
+
+	}
 	}
 
 	bigBoard.appendChild(line);
