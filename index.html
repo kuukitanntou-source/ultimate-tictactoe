@@ -459,6 +459,8 @@
 
 	#gameScreen {
 	  display: none;
+
+	position: relative;
 	}
 
 	#gameTop {
@@ -742,6 +744,21 @@
 
 	}
 
+	#winLineLayer {
+
+	  position: absolute;
+
+	  left: 0;
+	  top: 0;
+
+	  width: 100%;
+	  height: 100%;
+
+	  pointer-events: none;
+
+	  z-index: 20;
+	}
+
   </style>
 </head>
 
@@ -834,6 +851,8 @@
   </div>
 
   <div class="big-board" id="bigBoard"></div>
+
+  <div id="winLineLayer"></div>
 
   <div id="winModal">
 
@@ -1558,217 +1577,330 @@ document
 	const line =
 	  document.createElement("div");
 
-	const boardRect =
-	  bigBoard.getBoundingClientRect();
-
-	const scaleX =
-  	  boardRect.width / 650;
-
-	const scaleY =
-	  boardRect.height / 626;
-
-	const isMobile =
-	  window.innerWidth <= 768;
-
+	const boardRect = bigBoard.getBoundingClientRect();
+ 
+	const scaleX = boardRect.width / 650;
+ 
+	const scaleY = boardRect.height / 626;
+ 
+	const isMobile = window.innerWidth <= 768;
+ 
 	line.classList.add("win-line");
-
-	// 横
+	
+	// 上横
 	if (a === 0 && b === 1 && c === 2) {
 
-	  line.style.top =
-	    (90 * scaleY) + "px";
+	  const boards =
+	    document.querySelectorAll(".small-board");
 
-	  line.style.left =
-	    (-10 * scaleX) + "px";
+	  const leftRect =
+	    boards[0].getBoundingClientRect();
 
-	if (isMobile) {
+	  const rightRect =
+	    boards[2].getBoundingClientRect();
 
-	  line.style.animation =
-	    "drawWinLineMobile 0.5s forwards";
+	  const layerRect =
+ 	 document.querySelector("#winLineLayer")
+ 	   .getBoundingClientRect();
 
-	} else {
+	line.style.left =
+	  (
+	    leftRect.left
+	    - layerRect.left
+	  ) + "px";
 
-	  line.style.animation =
-	    "drawWinLine 0.5s forwards";
+	line.style.top =
+	  (
+	    leftRect.top
+	    - layerRect.top
+	    + leftRect.height / 2 - 10
+	  ) + "px";
 
-	}
+	  line.style.width =
+	    (rightRect.right - leftRect.left) + "px";
 
+	  line.style.animation = "none";
 	}
 
 	// 真ん中横
 	if (a === 3 && b === 4 && c === 5) {
 
-	  line.style.top =
-	    (300 * scaleY) + "px";
+	  const boards =
+	    document.querySelectorAll(".small-board");
+
+	  const leftRect =
+	    boards[3].getBoundingClientRect();
+
+	  const rightRect =
+	    boards[5].getBoundingClientRect();
+
+	  const layerRect =
+	    document.querySelector("#winLineLayer")
+	      .getBoundingClientRect();
 
 	  line.style.left =
-	    (-10 * scaleX) + "px";
+	    (leftRect.left - layerRect.left) + "px";
 
-	if (isMobile) {
+	  line.style.top =
+	    (
+	      leftRect.top
+	      - layerRect.top
+	      + leftRect.height / 2 - 10
+	    ) + "px";
 
-	  line.style.animation =
-	    "drawWinLineMobile 0.5s forwards";
+	  line.style.width =
+	    (rightRect.right - leftRect.left) + "px";
 
-	} else {
-
-	  line.style.animation =
-	    "drawWinLine 0.5s forwards";
-
-	}
-
+	  line.style.animation = "none";
 	}
 
 	// 下横
 	if (a === 6 && b === 7 && c === 8) {
 
-	  line.style.top =
-	    (510 * scaleY) + "px";
+	  const boards =
+	    document.querySelectorAll(".small-board");
+
+	  const leftRect =
+	    boards[6].getBoundingClientRect();
+
+	  const rightRect =
+	    boards[8].getBoundingClientRect();
+
+	  const layerRect =
+	    document.querySelector("#winLineLayer")
+	      .getBoundingClientRect();
 
 	  line.style.left =
-	    (-10 * scaleX) + "px";
+	    (leftRect.left - layerRect.left) + "px";
 
-	if (isMobile) {
+	  line.style.top =
+	    (
+	      leftRect.top
+	      - layerRect.top
+	      + leftRect.height / 2 - 10
+	    ) + "px";
 
-	  line.style.animation =
-	    "drawWinLineMobile 0.5s forwards";
+	  line.style.width =
+	    (rightRect.right - leftRect.left) + "px";
 
-	} else {
-
-	  line.style.animation =
-	    "drawWinLine 0.5s forwards";
-
-	}
+	  line.style.animation = "none";
 	}
 
 	// 左縦
 	if (a === 0 && b === 3 && c === 6) {
 
+	  const boards =
+	    document.querySelectorAll(".small-board");
+
+	  const topRect =
+	    boards[0].getBoundingClientRect();
+
+	  const bottomRect =
+	    boards[6].getBoundingClientRect();
+
+	  const layerRect =
+	    document.querySelector("#winLineLayer")
+	      .getBoundingClientRect();
+
 	  line.style.width = "20px";
 	  line.style.height = "0px";
 
-	  line.style.top =
-	    (-20 * scaleY) + "px";
-
 	  line.style.left =
-	    (90 * scaleX) + "px";
+	    (
+	      topRect.left
+	      - layerRect.left
+	      + topRect.width / 2 - 10
+	    ) + "px";
 
-	  if (window.innerWidth <= 768) {
+	  line.style.top =
+	    (topRect.top - layerRect.top) + "px";
 
-	  line.style.animation =
-	    "drawVerticalMobile 0.5s forwards";
+	  line.style.height =
+	    (bottomRect.bottom - topRect.top) + "px";
 
-	} else {
-
-	  line.style.animation =
-	    "drawVertical 0.5s forwards";
-
-	}
-
+	  line.style.animation = "none";
 	}
 
 	// 真ん中縦
 	if (a === 1 && b === 4 && c === 7) {
 
+	  const boards =
+	    document.querySelectorAll(".small-board");
+
+	  const topRect =
+	    boards[1].getBoundingClientRect();
+
+	  const bottomRect =
+	    boards[7].getBoundingClientRect();
+
+	  const layerRect =
+	    document.querySelector("#winLineLayer")
+	      .getBoundingClientRect();
+
 	  line.style.width = "20px";
 	  line.style.height = "0px";
 
-	  line.style.top =
-	    (-20 * scaleY) + "px";
-
 	  line.style.left =
-	    (310 * scaleX) + "px";
+	    (
+	      topRect.left
+	      - layerRect.left
+	      + topRect.width / 2 - 10
+	    ) + "px";
+
+	  line.style.top =
+	    (topRect.top - layerRect.top) + "px";
 
 	  if (window.innerWidth <= 768) {
 
-  	line.style.animation =
-  	  "drawVerticalMobile 0.5s forwards";
+	    line.style.height =
+	      (bottomRect.bottom - topRect.top) + "px";
 
-	} else {
+	  } else {
 
-	  line.style.animation =
-	    "drawVertical 0.5s forwards";
+	    line.style.height =
+	      (bottomRect.bottom - topRect.top) + "px";
 
-	}
+	  }
 
+	  line.style.animation = "none";
 	}
 
 	// 右縦
 	if (a === 2 && b === 5 && c === 8) {
 
+	  const boards =
+	    document.querySelectorAll(".small-board");
+
+	  const topRect =
+	    boards[2].getBoundingClientRect();
+
+	  const bottomRect =
+	    boards[8].getBoundingClientRect();
+
+	  const layerRect =
+	    document.querySelector("#winLineLayer")
+	      .getBoundingClientRect();
+
 	  line.style.width = "20px";
 	  line.style.height = "0px";
 
-	  line.style.top =
-	    (-20 * scaleY) + "px";
-
 	  line.style.left =
-	    (530 * scaleX) + "px";
+	    (
+	      topRect.left
+	      - layerRect.left
+	      + topRect.width / 2 - 10
+	    ) + "px";
 
-	  if (window.innerWidth <= 768) {
+	  line.style.top =
+	    (topRect.top - layerRect.top) + "px";
 
-	  line.style.animation =
-	    "drawVerticalMobile 0.5s forwards";
+	  line.style.height =
+	    (bottomRect.bottom - topRect.top) + "px";
 
-	} else {
-
-	  line.style.animation =
-	    "drawVertical 0.5s forwards";
-
-	}
-
+	  line.style.animation = "none";
 	}
 
 	// 斜め \
 	if (a === 0 && b === 4 && c === 8) {
 
+	  const boards =
+	    document.querySelectorAll(".small-board");
+
+	  const startRect =
+	    boards[0].getBoundingClientRect();
+
+	  const endRect =
+	    boards[8].getBoundingClientRect();
+
+	  const layerRect =
+	    document.querySelector("#winLineLayer")
+	      .getBoundingClientRect();
+
+	  const startX =
+	    startRect.left - layerRect.left;
+
+	  const startY =
+	    startRect.top - layerRect.top;
+
+	  const endX =
+	    endRect.right - layerRect.left;
+
+	  const endY =
+	    endRect.bottom - layerRect.top;
+
+	  const length =
+	    Math.sqrt(
+	      Math.pow(endX - startX, 2) +
+	      Math.pow(endY - startY, 2)
+	    );
+
 	  line.style.left =
-	    (-10 * scaleX) + "px";
+	     startX + "px";
 
 	  line.style.top =
-	    (-30 * scaleY) + "px";
+	    (startY - 10) + "px";
+
+	  line.style.width =
+	    length + "px";
 
 	  line.style.transform =
-	    "rotate(46deg)";
+	    "rotate(45.5deg)";
 
-	 if (isMobile) {
-
-	  line.style.animation =
-	    "drawDiagonalMobile 0.5s forwards";
-
-	} else {
-
-	  line.style.animation =
-	    "drawDiagonal 0.5s forwards";
-
-	}
+	  line.style.animation = "none";
 	}
 
 	// 斜め /
 	if (a === 2 && b === 4 && c === 6) {
 
+	  const boards =
+	    document.querySelectorAll(".small-board");
+
+	  const startRect =
+	    boards[2].getBoundingClientRect();
+
+	  const endRect =
+	    boards[6].getBoundingClientRect();
+
+	  const layerRect =
+	    document.querySelector("#winLineLayer")
+	      .getBoundingClientRect();
+
+	  const startX =
+	    startRect.right - layerRect.left;
+
+	  const startY =
+	    startRect.top - layerRect.top;
+
+	  const endX =
+	    endRect.left - layerRect.left;
+
+	  const endY =
+	    endRect.bottom - layerRect.top;
+
+	  const length =
+	    Math.sqrt(
+	      Math.pow(startX - endX, 2) +
+	      Math.pow(endY - startY, 2)
+	    );
+
 	  line.style.left =
-	    (660 * scaleX) + "px";
+	     startX + "px";
 
 	  line.style.top =
-	    (-30 * scaleY) + "px";
+	    (startY - 10) + "px";
+
+	  line.style.width =
+	    length + "px";
 
 	  line.style.transform =
 	    "rotate(134deg)";
 
-	  if (isMobile) {
-
-	  line.style.animation =
-	    "drawDiagonalMobile 0.5s forwards";
-
-	} else {
-
-	  line.style.animation =
-	    "drawDiagonal 0.5s forwards";
-
-	}
+	  line.style.animation = "none";
 	}
 
-	bigBoard.appendChild(line);
+	document
+	  .querySelector("#winLineLayer")
+	  .appendChild(line);
 
           // 全盤面クリック禁止
           document
