@@ -315,7 +315,7 @@
 	  .small-board {
 
   		grid-template-columns:
-    	  repeat(3, min(10vw, 40px));
+    	  repeat(3, min(9vw, 40px));
 
   		padding: 3px;
 
@@ -323,8 +323,8 @@
 
 	  .cell {
 
-	    width: min(10vw, 40px);
-    	height: min(10vw, 40px);
+	    width: min(9vw, 40px);
+    	height: min(9vw, 40px);
 
 	  }
 
@@ -342,9 +342,15 @@
 
 	  #titleScreen {
 
-	    padding-top: 20px;
+		min-height: 100vh;
 
-	  }
+		  display: flex;
+
+		  flex-direction: column;
+
+		  justify-content: center;
+
+		}
 
 	}
 
@@ -386,7 +392,7 @@
 
 	  #titleScreen h1 {
 
-	    font-size: 56px;
+	    font-size: min(12vw, 56px);
 
 	  }
 
@@ -2864,7 +2870,10 @@ console.log("フォーク阻止で置く");
 
   </script>
 
-  
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+  <script>
+    eruda.init();
+  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
