@@ -304,6 +304,8 @@
 	
 	  .big-board {
 
+		max-width: 100vw;
+
 	    gap: 5px;
 
 		width: fit-content;
@@ -313,7 +315,7 @@
 	  .small-board {
 
   		grid-template-columns:
-    	  repeat(3, 39px);
+    	  repeat(3, min(10vw, 40px));
 
   		padding: 3px;
 
@@ -321,8 +323,8 @@
 
 	  .cell {
 
-	    width: 40px;
-  	    height: 40px;
+	    width: min(10vw, 40px);
+    	height: min(10vw, 40px);
 
 	  }
 
@@ -765,12 +767,171 @@
 	  z-index: 20;
 	}
 
+#settingsButton {
+
+  position: fixed;
+
+  right: 10px;
+  top: 10px;
+
+  width: 42px;
+  height: 42px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  font-size: 20px;
+
+  background: rgba(255,255,255,0.9);
+
+  box-shadow:
+    0 0 10px rgba(120,220,255,0.5);
+
+  z-index: 10000;
+}
+
+#settingsModal {
+
+  display: none;
+
+  position: fixed;
+
+  left: 0;
+  top: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background: rgba(0,0,0,0.6);
+
+  justify-content: center;
+  align-items: center;
+
+  z-index: 10001;
+}
+
+#settingsContent {
+
+  width: 280px;
+
+  background: white;
+
+  border-radius: 20px;
+
+  padding: 25px;
+
+  text-align: center;
+
+  box-shadow:
+    0 0 25px rgba(120,220,255,0.8);
+
+  animation: popupShow 0.3s ease;
+}
+
+#settingsContent h3 {
+
+  margin-top: 0;
+
+  font-size: 28px;
+
+  margin-bottom: 25px;
+}
+
+.volume-row {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-bottom: 25px;
+}
+
+#volumeSlider {
+
+  flex: 1;
+
+  cursor: pointer;
+}
+
+#closeSettings {
+
+  width: 140px;
+
+  height: 45px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #e8e8e8;
+
+  font-size: 18px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 3px 8px rgba(0,0,0,0.25);
+}
+
+.volume-value {
+
+  text-align: center;
+
+  font-size: 20px;
+
+  font-weight: bold;
+
+  margin-top: 10px;
+
+  margin-bottom: 15px;
+
+}
+
   </style>
 </head>
 
 <body>
 
-  <div id="titleScreen">
+<button id="settingsButton">
+	  ⚙️
+	</button>
+
+	<div id="settingsModal">
+	  <div id="settingsContent">
+
+	  <h3>🔊 音量設定</h3>
+
+	  <div class="volume-row">
+
+	    <span>0</span>
+
+	    <input
+	      type="range"
+	      id="volumeSlider"
+	      min="0"
+	      max="100"
+	      value="50"
+	    >
+
+	    <span>100</span>
+
+	  </div>
+
+	  <div class="volume-value">
+	  <span id="volumeValue">50</span>%
+	</div>
+
+	  <button id="closeSettings">
+	    閉じる
+	  </button>
+
+	</div>
+	</div>
+
+	  <div id="titleScreen">
 
   <h1>究極〇×ゲーム</h1>
 
@@ -840,7 +1001,7 @@
 
 </div>
 
-</div>
+	</div>
 
 <div id="gameScreen">
 
@@ -880,12 +1041,7 @@
     <source src="click.mp3" type="audio/mpeg">
   </audio>
 
-
-  <audio id="clickSound">
-    <source src="click.mp3" type="audio/mpeg">
-  </audio>
-
-  <audio id="placeSound">
+   <audio id="placeSound">
     <source src="place.mp3" type="audio/mpeg">
   </audio>
 
@@ -909,6 +1065,61 @@
 	  document.getElementById(
 	    "gameScreen"
 	  );
+
+    const settingsButton =
+	  document.getElementById(
+	    "settingsButton"
+	  );
+
+	const settingsModal =
+	  document.getElementById(
+	    "settingsModal"
+	  );
+
+	const closeSettings =
+	  document.getElementById(
+	    "closeSettings"
+	  );
+
+	settingsButton.addEventListener(
+	  "click",
+	  () => {
+
+	    settingsModal.style.display =
+	      "flex";
+
+	  }
+	);
+
+	closeSettings.addEventListener(
+	  "click",
+	  () => {
+
+	    settingsModal.style.display =
+	      "none";
+
+	  }
+	);
+
+	const volumeSlider =
+	  document.getElementById(
+	    "volumeSlider"
+	  );
+
+	const volumeValue =
+	  document.getElementById(
+	    "volumeValue"
+	  );
+
+	volumeSlider.addEventListener(
+	  "input",
+	  () => {
+
+	    volumeValue.textContent =
+	      volumeSlider.value;
+
+	  }
+	);
 
 	document
 	  .querySelectorAll(
@@ -953,7 +1164,7 @@
       }
     );
 
-});
+	});
 
 	document
 	  .getElementById("multiBtn")
@@ -964,10 +1175,8 @@
 
 	    gameScreen.style.display =
 	      "block";
+	});
 
-	
-
-});
     const bigBoard = document.getElementById("bigBoard");
     const statusText = document.getElementById("status");
     const resetButton =
@@ -1062,7 +1271,8 @@ document
       "click",
       () => {
 
-        clickSound.currentTime = 0;
+        clickSound.volume =
+  		  masterVolume;
 
         clickSound.play();
 
@@ -1078,6 +1288,43 @@ document
     let aiLevel = "normal";
 
     let gameOver = false;
+
+    let masterVolume =
+	  Number(
+	    localStorage.getItem(
+	      "volume"
+	    )
+	  ) || 0.5;
+
+	volumeSlider.addEventListener(
+  	"input",
+  	() => {
+
+  	  masterVolume =
+  	    volumeSlider.value / 100;
+
+  	  localStorage.setItem(
+  	    "volume",
+  	    masterVolume
+	  	);
+
+	  }
+	);
+
+	volumeSlider.value =
+	  masterVolume * 100;
+
+	localStorage.setItem(
+	  "volume",
+	  masterVolume
+	);
+
+	masterVolume =
+	  Number(
+	    localStorage.getItem(
+	      "volume"
+	    )
+	  ) || 0.5;	
 
 	function checkFullDraw() {
 
@@ -1258,7 +1505,9 @@ document
 
           smallBoard.classList.add("won");
 
-	smallWinSound.currentTime = 0;
+	smallWinSound.volume =
+  	  masterVolume;
+	
 	smallWinSound.play();
 
           const winnerText =
@@ -1366,8 +1615,10 @@ document
 
 	  if (player === "〇") {
 
-	placeSound.currentTime = 0;
-	    placeSound.play();
+	placeSound.volume =
+  	  masterVolume;
+
+	placeSound.play();
 
 	    cell.innerHTML = `
 	      <svg viewBox="0 0 50 50">
@@ -1385,13 +1636,17 @@ document
 
 	  } else {
 
-	placeSound.currentTime = 0;
-	    placeSound.play();
+	placeSound.volume =
+  	  masterVolume;
+
+	placeSound.play();
 
 	    setTimeout(() => {
 
-	      placeSound.currentTime = 0;
-	      placeSound.play();
+	      placeSound.volume =
+  		    masterVolume;
+
+		  placeSound.play();
 
 	    }, 150);
 
@@ -1527,11 +1782,11 @@ document
 
 	}
 
-	//statusText.style.display =
-	  //"none";
+	statusText.style.visibility =
+  	  "hidden";
 
-	//resetButton.style.display =
-	  //"none";
+	resetButton.style.visibility =
+	  "hidden";
 
 	winModal.style.display =
 	  "flex";
@@ -1566,7 +1821,9 @@ document
 
 	gameOver = true;
 
-	bigWinSound.currentTime = 0;
+	bigWinSound.volume =
+  	  masterVolume;
+	
 	bigWinSound.play();
 
 	// 勝利した小さい盤面を取得
@@ -2607,10 +2864,7 @@ console.log("フォーク阻止で置く");
 
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-  <script>
-    eruda.init();
-  </script>
+  
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
