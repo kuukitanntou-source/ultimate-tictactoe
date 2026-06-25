@@ -342,15 +342,15 @@
 
 	  #titleScreen {
 
-		min-height: 100vh;
+	  height: 100dvh;
 
-		  display: flex;
+	  display: flex;
 
-		  flex-direction: column;
+	  flex-direction: column;
 
-		  justify-content: center;
+	  justify-content: center;
 
-		}
+	}
 
 	}
 
@@ -1117,17 +1117,7 @@
 	    "volumeValue"
 	  );
 
-	volumeSlider.addEventListener(
-	  "input",
-	  () => {
-
-	    volumeValue.textContent =
-	      volumeSlider.value;
-
-	  }
-	);
-
-	document
+		document
 	  .querySelectorAll(
 	    ".difficulty-btn"
 	  )
@@ -1302,37 +1292,33 @@ document
 	    )
 	  ) || 0.5;
 
+	volumeSlider.value =
+	  masterVolume * 100;
+
+	volumeValue.textContent =
+	  Math.round(
+	    masterVolume * 100
+	  );
+
 	volumeSlider.addEventListener(
-  	"input",
-  	() => {
+	  "input",
+	  () => {
 
-  	  masterVolume =
-  	    volumeSlider.value / 100;
+	    masterVolume =
+	      volumeSlider.value / 100;
 
-  	  localStorage.setItem(
-  	    "volume",
-  	    masterVolume
-	  	);
+	    volumeValue.textContent =
+	      volumeSlider.value;
+
+	    localStorage.setItem(
+	      "volume",
+	      masterVolume
+	    );
 
 	  }
 	);
 
-	volumeSlider.value =
-	  masterVolume * 100;
-
-	localStorage.setItem(
-	  "volume",
-	  masterVolume
-	);
-
-	masterVolume =
-	  Number(
-	    localStorage.getItem(
-	      "volume"
-	    )
-	  ) || 0.5;	
-
-	function checkFullDraw() {
+		function checkFullDraw() {
 
 	  if (gameOver) {
 	    return;
@@ -2870,7 +2856,10 @@ console.log("フォーク阻止で置く");
 
   </script>
 
-  
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+  <script>
+    eruda.init();
+  </script>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
