@@ -1295,6 +1295,15 @@ document
 	    ? Number(savedVolume)
 	    : 0.5;
 
+	function applyVolume() {
+
+	  clickSound.volume = masterVolume;
+	  placeSound.volume = masterVolume;
+	  smallWinSound.volume = masterVolume;
+	  bigWinSound.volume = masterVolume;
+
+	}
+
 	volumeSlider.value =
 	  masterVolume * 100;
 
@@ -1303,7 +1312,7 @@ document
 	    masterVolume * 100
 	  );
 
-	volumeSlider.addEventListener(
+		volumeSlider.addEventListener(
 	  "input",
 	  () => {
 
@@ -1317,6 +1326,8 @@ document
 	      "volume",
 	      masterVolume
 	    );
+
+	    applyVolume();
 
 	  }
 	);
@@ -2847,6 +2858,8 @@ console.log("フォーク阻止で置く");
 	  document.getElementById(
 	    "bigWinSound"
 	  );
+
+	applyVolume();
 
 	backTitleBtn.addEventListener(
 	  "click",
