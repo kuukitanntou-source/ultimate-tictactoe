@@ -1285,12 +1285,15 @@ document
 
     let gameOver = false;
 
-    let masterVolume =
-	  Number(
-	    localStorage.getItem(
-	      "volume"
-	    )
-	  ) || 0.5;
+    const savedVolume =
+	  localStorage.getItem(
+	    "volume"
+	  );
+
+	let masterVolume =
+	  savedVolume !== null
+	    ? Number(savedVolume)
+	    : 0.5;
 
 	volumeSlider.value =
 	  masterVolume * 100;
@@ -2856,7 +2859,11 @@ console.log("フォーク阻止で置く");
 
   </script>
 
-  
+  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+  <script>
+    eruda.init();
+  </script>
+
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
 </body>
