@@ -196,65 +196,6 @@ console.log(
 	  }
 	);
 
-    const savedVolume =
-	  localStorage.getItem(
-	    "volume"
-	  );
-
-	let masterVolume =
-	  savedVolume !== null
-	    ? Number(savedVolume)
-	    : 0.5;
-
-	const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-	const masterGain = audioContext.createGain();
-	masterGain.connect(audioContext.destination);
-	masterGain.gain.value = masterVolume;
-
-	const soundBuffers = {
-	  click: null,
-	  place: null,
-	  smallWin: null,
-	  bigWin: null,
-	};
-
-	async function loadSound(name, url) {
-
-	  const response = await fetch(url);
-	  const arrayBuffer = await response.arrayBuffer();
-	  soundBuffers[name] = await audioContext.decodeAudioData(arrayBuffer);
-
-	}
-
-	loadSound("click", "click.mp3");
-	loadSound("place", "place.mp3");
-	loadSound("smallWin", "smallwin.mp3");
-	loadSound("bigWin", "bigwin.mp3");
-
-	function playSound(name) {
-
-	  const buffer = soundBuffers[name];
-
-	  if (!buffer) {
-	    return;
-	  }
-
-	  const source = audioContext.createBufferSource();
-	  source.buffer = buffer;
-	  source.connect(masterGain);
-	  source.start(0);
-
-	}
-
-	function unlockAudioContext() {
-
-	  if (audioContext.state === "suspended") {
-	    audioContext.resume();
-	  }
-
-	}
-
 document
   .querySelectorAll("button")
   .forEach(button => {
@@ -263,9 +204,10 @@ document
       "click",
       () => {
 
-        unlockAudioContext();
+        clickSound.volume =
+  		  masterVolume;
 
-        playSound("click");
+        clickSound.play();
 
       }
     );
@@ -280,9 +222,22 @@ document
 
     let gameOver = false;
 
+    const savedVolume =
+	  localStorage.getItem(
+	    "volume"
+	  );
+
+	let masterVolume =
+	  savedVolume !== null
+	    ? Number(savedVolume)
+	    : 0.5;
+
 	function applyVolume() {
 
-	  masterGain.gain.value = masterVolume;
+	  clickSound.volume = masterVolume;
+	  placeSound.volume = masterVolume;
+	  smallWinSound.volume = masterVolume;
+	  bigWinSound.volume = masterVolume;
 
 	}
 
@@ -408,8 +363,6 @@ document
 
        cell.addEventListener("click", () => {
 
-  	unlockAudioContext();
-
   	if (cell.innerHTML !== "") {
   	  return;
   	}
@@ -495,7 +448,10 @@ document
 
           smallBoard.classList.add("won");
 
-	playSound("smallWin");
+	smallWinSound.volume =
+  	  masterVolume;
+
+	smallWinSound.play();
 
           const winnerText =
             document.createElement("div");
@@ -604,7 +560,10 @@ document
 
 	  if (player === "〇") {
 
-	playSound("place");
+	placeSound.volume =
+  	  masterVolume;
+
+	placeSound.play();
 
 	    cell.innerHTML = `
 	      <svg viewBox="0 0 50 50">
@@ -622,11 +581,17 @@ document
 
 	  } else {
 
-	playSound("place");
+	placeSound.volume =
+  	  masterVolume;
+
+	placeSound.play();
 
 	    setTimeout(() => {
 
-		  playSound("place");
+	      placeSound.volume =
+  		    masterVolume;
+
+		  placeSound.play();
 
 	    }, 150);
 
@@ -801,7 +766,10 @@ document
 
 	gameOver = true;
 
-	playSound("bigWin");
+	bigWinSound.volume =
+  	  masterVolume;
+
+	bigWinSound.play();
 
 	// 勝利した小さい盤面を取得
 	const boards =
@@ -1809,6 +1777,28 @@ console.log("フォーク阻止で置く");
 
 	aiPlace(randomCell);
 	   }
+
+	const clickSound =
+	  document.getElementById(
+	    "clickSound"
+	  );
+
+	const placeSound =
+	  document.getElementById(
+	    "placeSound"
+	  );
+
+	const smallWinSound =
+	  document.getElementById(
+	    "smallWinSound"
+	  );
+
+	const bigWinSound =
+	  document.getElementById(
+	    "bigWinSound"
+	  );
+
+	applyVolume();
 
 	backTitleBtn.addEventListener(
 	  "click",
