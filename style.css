@@ -368,24 +368,21 @@
 
 	#titleScreen {
   	text-align: center;
-  	padding-top: 40px;
+  	padding-top: clamp(8px, 3dvh, 40px);
+  	padding-bottom: clamp(8px, 3dvh, 40px);
 	}
 
 	#titleScreen h1 {
 
-	  font-size: 72px;
+	  font-size: clamp(26px, min(7dvh, 11vw), 72px);
+
+	  margin: clamp(4px, 1.2dvh, 20px) 0;
 
 	  white-space: nowrap;
 
 	}
 
 	@media (max-width: 768px) {
-
-	  #titleScreen h1 {
-
-	    font-size: min(12vw, 56px);
-
-	  }
 
 	#gameScreen {
 
@@ -404,20 +401,20 @@
 
 	#titleScreen button {
 	  display: block;
-	  margin: 10px auto;
-	  padding: 10px 20px;
-	  font-size: 18px;
+	  margin: clamp(3px, 1.2dvh, 10px) auto;
+	  padding: clamp(4px, 1dvh, 10px) 20px;
+	  font-size: clamp(12px, 2.2dvh, 18px);
 	}
 
 	#multiBtn {
 
-	  margin-top: 30px;
+	  margin-top: clamp(6px, 2.5dvh, 30px);
 
 	}
 
 	#ruleBtn {
 
-	  margin-top: 30px !important;
+	  margin-top: clamp(6px, 2.5dvh, 30px) !important;
 
 	}
 
@@ -427,18 +424,18 @@
 	  flex-direction: column;
 	  align-items: center;
 
-	  gap: 6px;
+	  gap: clamp(2px, 0.8dvh, 6px);
 
-	  margin-bottom: 40px;
+	  margin-bottom: clamp(8px, 3dvh, 40px);
 
 	}
 
 	.difficulty-btn {
 
-	  width: 220px;
-	  height: 60px;
+	  width: clamp(140px, 40vw, 220px);
+	  height: clamp(32px, 6.5dvh, 60px);
 
-	  font-size: 28px;
+	  font-size: clamp(14px, 3.2dvh, 28px);
 
 	  border-radius: 15px;
 
@@ -482,9 +479,11 @@
 
 	  color: #fff;
 
-	  font-size: 22px;
+	  font-size: clamp(12px, 2.6dvh, 22px);
 
 	  font-weight: bold;
+
+	  margin: clamp(3px, 1dvh, 16px) 0;
 
 	}
 
@@ -492,18 +491,20 @@
 
 	  color: gold;
 
-	  font-size: 26px;
+	  font-size: clamp(13px, 3dvh, 26px);
 
 	  font-weight: bold;
+
+	  margin: clamp(3px, 1dvh, 16px) 0;
 
 	}
 
 	#titleScreen button {
 
-	  width: 180px;
-	  height: 50px;
+	  width: clamp(120px, 45vw, 180px);
+	  height: clamp(32px, 6.2dvh, 50px);
 
-	  font-size: 22px;
+	  font-size: clamp(13px, 2.6dvh, 22px);
 
 	  border: none;
 
