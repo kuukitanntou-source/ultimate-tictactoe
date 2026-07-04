@@ -194,7 +194,7 @@
 
     #status {
 
-     font-size: 50px;
+     font-size: 58px;
 
      font-weight: bold;
 
@@ -321,7 +321,7 @@
 
 	  #status {
 
-	    font-size: 22px;
+	    font-size: 26px;
 
 	  }
 
@@ -388,7 +388,7 @@
 
  	 width: 100%;
 
- 	 display: flex;
+ 	 display: flex !important;
 
  	 flex-direction: column;
 
