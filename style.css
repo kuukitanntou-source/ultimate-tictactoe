@@ -321,7 +321,7 @@
 
 	  #status {
 
-	    font-size: 26px;
+	    font-size: 40px;
 
 	  }
 
@@ -388,7 +388,7 @@
 
  	 width: 100%;
 
- 	 display: flex !important;
+ 	 display: flex;
 
  	 flex-direction: column;
 
@@ -459,6 +459,7 @@
 	  display: none;
 
 	position: relative;
+	flex-direction: column;
 	}
 
 	#gameTop {

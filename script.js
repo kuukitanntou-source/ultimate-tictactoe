@@ -85,7 +85,7 @@
           "none";
 
         gameScreen.style.display =
-          "block";
+          "flex";
 
         gameMode = "ai";
 
@@ -107,7 +107,7 @@
 	      "none";
 
 	    gameScreen.style.display =
-	      "block";
+	      "flex";
 	});
 
     const bigBoard = document.getElementById("bigBoard");
