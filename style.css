@@ -7,7 +7,7 @@
 
   flex-direction: column;
 
-  min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
 
   background: #1f4d2e;
@@ -15,6 +15,7 @@
   font-family: sans-serif;
 
   overflow: hidden;
+  overscroll-behavior-y: none;
 }
 
     .big-board {
