@@ -1195,11 +1195,609 @@ document
 
 	}
 
-	function aiMoveHard() {
+	// ======================
+	// Hard専用 評価関数
+	// (実在するルールのみを対象に評価する)
+	// ======================
 
-	  aiMoveNormal();
+	// 盤面内の位置の重み(中央 > 角 > 辺)
+	// 小盤面内のマス番号にも、大盤面内の盤番号にも
+	// 同じ並び(0〜8)なので使い回せる
+	const POSITION_WEIGHTS = [
+	  2, 1, 2,
+	  1, 3, 1,
+	  2, 1, 2
+	];
+
+	// 指定プレイヤーのリーチ数(2個並び+空き1)を数える
+	function countReachForPlayer(boardCells, player) {
+
+	  let count = 0;
+
+	  for (let pattern of winPatterns) {
+
+	    const [a, b, c] = pattern;
+
+	    const line = [
+	      boardCells[a],
+	      boardCells[b],
+	      boardCells[c]
+	    ];
+
+	    const playerCount =
+	      line.filter(
+	        cell => cell.dataset.player === player
+	      ).length;
+
+	    const emptyCount =
+	      line.filter(
+	        cell => !cell.dataset.player
+	      ).length;
+
+	    if (playerCount === 2 && emptyCount === 1) {
+	      count++;
+	    }
+
+	  }
+
+	  return count;
 
 	}
+
+	// 指定プレイヤーの育成中のライン数(1個+空き2)を数える
+	function countBuildingForPlayer(boardCells, player) {
+
+	  let count = 0;
+
+	  for (let pattern of winPatterns) {
+
+	    const [a, b, c] = pattern;
+
+	    const line = [
+	      boardCells[a],
+	      boardCells[b],
+	      boardCells[c]
+	    ];
+
+	    const playerCount =
+	      line.filter(
+	        cell => cell.dataset.player === player
+	      ).length;
+
+	    const emptyCount =
+	      line.filter(
+	        cell => !cell.dataset.player
+	      ).length;
+
+	    if (playerCount === 1 && emptyCount === 2) {
+	      count++;
+	    }
+
+	  }
+
+	  return count;
+
+	}
+
+	// 小盤面内でのマスの位置評価
+	function evaluateSmallBoardPosition(cellIndex) {
+
+	  return POSITION_WEIGHTS[cellIndex];
+
+	}
+
+	// 大盤面内でのその小盤面の位置評価
+	// (勝敗が決した盤は戦略的価値が無いので0)
+	function evaluateBigBoardPosition(boardIndex) {
+
+	  if (bigBoardState[boardIndex] !== "") {
+	    return 0;
+	  }
+
+	  return POSITION_WEIGHTS[boardIndex];
+
+	}
+
+	// 相手が次に狙ってきそうな盤面ほど高いスコアを返す
+	// (勝敗に直結しない場面で、先回りして妨害するための評価)
+	function evaluateOpponentTargetValue(boardIndex, boardCells) {
+
+	  if (bigBoardState[boardIndex] !== "") {
+	    return 0;
+	  }
+
+	  const reach =
+	    countReachForPlayer(boardCells, "〇");
+
+	  const building =
+	    countBuildingForPlayer(boardCells, "〇");
+
+	  return (
+	    reach * 6 +
+	    building * 1.5 +
+	    evaluateBigBoardPosition(boardIndex)
+	  );
+
+	}
+
+	// Hard専用: 勝敗に直結しない場面での候補手の総合評価
+	// (大盤面・小盤面の位置評価 + 相手の先回り妨害評価)
+	function evaluateHardMove(cell, boards) {
+
+	  const board = boards[cell.boardIndex];
+
+	  const boardCells =
+	    board.querySelectorAll(".cell");
+
+	  let score = 0;
+
+	  score += evaluateSmallBoardPosition(cell.cellIndex);
+
+	  score += evaluateBigBoardPosition(cell.boardIndex) * 2;
+
+	  score += evaluateOpponentTargetValue(
+	    cell.boardIndex,
+	    boardCells
+	  );
+
+	  return score;
+
+	}
+
+	function aiMoveHard() {
+
+	const boards =
+	  document.querySelectorAll(".small-board");
+
+	 const cells =
+	document.querySelectorAll(".cell");
+
+	  const emptyCells = [];
+
+	  cells.forEach(cell => {
+
+	    if (
+	      cell.innerHTML === "" &&
+	      !cell.closest(".won")
+	    ) {
+
+	      emptyCells.push(cell);
+
+	    }
+
+	  });
+
+		// 空き無し
+		if (emptyCells.length === 0) {
+		  return;
+		}
+
+		// ======================
+		// 大盤面で勝てる場所を探す
+		// ======================
+
+		const targetBoards = [];
+
+		for (let pattern of winPatterns) {
+
+		  const [a, b, c] = pattern;
+
+		  const line = [
+		    bigBoardState[a],
+		    bigBoardState[b],
+		    bigBoardState[c]
+		  ];
+
+		  const aiCount =
+		    line.filter(v => v === "×").length;
+
+		  const emptyIndex =
+		    pattern.find(
+		      index =>
+		        bigBoardState[index] === ""
+		    );
+
+		  if (
+		    aiCount === 2 &&
+		    emptyIndex !== undefined
+		  ) {
+
+		    targetBoards.push(emptyIndex);
+
+		  }
+
+		}
+
+		// ======================
+		// 大盤面で勝てるなら優先
+		// ======================
+
+		if (targetBoards.length > 0) {
+
+	  	const boardIndex =
+	  	  targetBoards[0];
+
+	  	const boardCells =
+		    emptyCells.filter(
+		      cell =>
+		        cell.boardIndex === boardIndex
+		    );
+
+		  if (boardCells.length > 0) {
+
+		    const center =
+		      boardCells.find(
+		        cell =>
+		          cell.cellIndex === 4
+		      );
+
+		    if (center) {
+
+		      aiPlace(center);
+
+		    } else {
+
+		      aiPlace(
+		        boardCells[
+		          Math.floor(
+		       	    Math.random() *
+		            boardCells.length
+		          )
+		        ]
+		      );
+
+		    }
+
+		    return;
+
+		  }
+
+		}
+
+
+		  // ======================
+		  // 勝てるなら勝つ
+		  // ======================
+
+	 	for (let board of boards) {
+
+	 	 if (
+	 	   board.classList.contains("won") ||
+	 	   board.classList.contains("draw-board")
+	 	 ) {
+	 	   continue;
+	 	 }
+
+	 	 const boardCells =
+	 	   board.querySelectorAll(".cell");
+
+	 	 for (let pattern of winPatterns) {
+
+	 	   const [a,b,c] = pattern;
+
+	 	   const line = [
+	 	     boardCells[a],
+	 	     boardCells[b],
+	 	     boardCells[c]
+	 	   ];
+
+	 	   const aiCount =
+	 	     line.filter(
+	 	       cell =>
+	 	         cell.dataset.player === "×"
+	 	     ).length;
+
+	 	   const emptyCell =
+	 	     line.find(
+	 	       cell =>
+	 	         !cell.dataset.player
+	 	     );
+
+	 	   if (aiCount === 2 && emptyCell) {
+
+	 	     aiPlace(emptyCell);
+
+	 	     return;
+
+	 	   }
+
+	 	 }
+
+		}
+
+	 	 // ======================
+	 	 // 負けそうなら防ぐ
+	 	 // ======================
+
+		  for (let board of boards) {
+
+		  if (
+		    board.classList.contains("won") ||
+		    board.classList.contains("draw-board")
+		  ) {
+		    continue;
+		  }
+
+		  const boardCells =
+		    board.querySelectorAll(".cell");
+
+		  for (let pattern of winPatterns) {
+
+		    const [a,b,c] = pattern;
+
+		    const line = [
+		      boardCells[a],
+		      boardCells[b],
+		      boardCells[c]
+		    ];
+
+		    const playerCount =
+		      line.filter(
+		        cell =>
+		          cell.dataset.player === "〇"
+		      ).length;
+
+		    const emptyCell =
+		      line.find(
+		        cell =>
+		          !cell.dataset.player
+		      );
+
+		    if (
+		      playerCount === 2 &&
+		      emptyCell
+		    ) {
+
+		      aiPlace(emptyCell);
+
+		      return;
+
+		    }
+
+		  }
+
+		}
+
+
+		// ======================
+		// 大盤面で負けそうなら防ぐ
+		// ======================
+
+		const blockBoards = [];
+
+		for (let pattern of winPatterns) {
+
+		  const [a, b, c] = pattern;
+
+		  const line = [
+		    bigBoardState[a],
+		    bigBoardState[b],
+		    bigBoardState[c]
+		  ];
+
+		  const playerCount =
+		    line.filter(
+		      v => v === "〇"
+		    ).length;
+
+		  const emptyIndex =
+		    pattern.find(
+		      index =>
+		        bigBoardState[index] === ""
+		    );
+
+		  if (
+		    playerCount === 2 &&
+		    emptyIndex !== undefined
+		  ) {
+
+		    blockBoards.push(
+		      emptyIndex
+		    );
+
+		  }
+
+		}
+
+		if (blockBoards.length > 0) {
+
+		  const boardIndex =
+		    blockBoards[0];
+
+		  const boardCells =
+		    emptyCells.filter(
+		      cell =>
+		        cell.boardIndex === boardIndex
+		    );
+
+		  if (boardCells.length > 0) {
+
+		const center =
+		      boardCells.find(
+		        cell =>
+		          cell.cellIndex === 4
+		      );
+
+		    if (center) {
+
+		      aiPlace(center);
+
+		    } else {
+
+		    aiPlace(
+		      boardCells[
+		        Math.floor(
+		          Math.random() *
+		          boardCells.length
+		        )
+		      ]
+		    );
+
+		   }
+
+		    return;
+
+		  }
+
+		}
+
+		// ======================
+		// 本物のフォーク作成
+		// ======================
+
+		for (let board of boards) {
+
+		  if (
+		    board.classList.contains("won") ||
+		    board.classList.contains("draw-board")
+		  ) {
+		    continue;
+		  }
+
+		  const boardCells =
+		    Array.from(
+		      board.querySelectorAll(".cell")
+		    );
+
+		  const emptyBoardCells =
+		    boardCells.filter(
+		      cell =>
+		        !cell.dataset.player
+		    );
+
+		  for (let testCell of emptyBoardCells) {
+
+		    testCell.dataset.player = "×";
+
+		    const threats =
+		      countThreats(boardCells);
+
+		    delete testCell.dataset.player;
+
+		    if (threats >= 2) {
+
+		      aiPlace(testCell);
+
+		      return;
+
+		    }
+
+		  }
+
+		}
+
+		// ======================
+		// 相手のフォーク阻止
+		// ======================
+
+		for (let board of boards) {
+
+		  if (
+		    board.classList.contains("won") ||
+		    board.classList.contains("draw-board")
+		  ) {
+		    continue;
+		  }
+
+		  const boardCells =
+		    Array.from(
+		      board.querySelectorAll(".cell")
+		    );
+
+		  const emptyBoardCells =
+		    boardCells.filter(
+		      cell =>
+		        !cell.dataset.player
+		    );
+
+		  for (let testCell of emptyBoardCells) {
+
+		    testCell.dataset.player = "〇";
+
+		    let threats = 0;
+
+		    for (let pattern of winPatterns) {
+
+		      const [a,b,c] = pattern;
+
+		      const line = [
+		        boardCells[a],
+		        boardCells[b],
+		        boardCells[c]
+		      ];
+
+		      const playerCount =
+		        line.filter(
+		          cell =>
+		            cell.dataset.player === "〇"
+		        ).length;
+
+		      const emptyCount =
+		        line.filter(
+		          cell =>
+		            !cell.dataset.player
+		        ).length;
+
+		      if (
+		        playerCount === 2 &&
+		        emptyCount === 1
+		      ) {
+
+		        threats++;
+
+		      }
+
+		    }
+
+		    delete testCell.dataset.player;
+
+		    if (threats >= 2) {
+
+		      aiPlace(testCell);
+
+		      return;
+
+		    }
+
+		  }
+
+		}
+
+		// ======================
+		// Hard専用: 位置評価 + 先回り妨害評価による最善手選択
+		// (Normalの中央優先・角優先の固定ルールをここだけ置き換える)
+		// ======================
+
+		let bestScore = -Infinity;
+		let bestCells = [];
+
+		emptyCells.forEach(cell => {
+
+		  const score = evaluateHardMove(cell, boards);
+
+		  if (score > bestScore) {
+
+		    bestScore = score;
+		    bestCells = [cell];
+
+		  } else if (score === bestScore) {
+
+		    bestCells.push(cell);
+
+		  }
+
+		});
+
+		aiPlace(
+		  bestCells[
+		    Math.floor(
+		      Math.random() *
+		      bestCells.length
+		    )
+		  ]
+		);
+
+	   }
 
 	function aiMove() {
 
