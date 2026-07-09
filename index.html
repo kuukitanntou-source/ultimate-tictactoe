@@ -56,6 +56,32 @@
   </p>
 
   <p class="difficulty-title">
+    先攻・後攻を選択
+  </p>
+
+  <div id="turnOrderArea">
+
+    <button
+      class="turn-order-btn selected-turn-order"
+      data-order="first">
+      先攻(〇)
+    </button>
+
+    <button
+      class="turn-order-btn"
+      data-order="second">
+      後攻(×)
+    </button>
+
+    <button
+      class="turn-order-btn"
+      data-order="random">
+      ランダム
+    </button>
+
+  </div>
+
+  <p class="difficulty-title">
     AIの強さを選択
   </p>
 
@@ -96,19 +122,15 @@
     <h2>ルール説明</h2>
 
     <p>
-      小さい〇×ゲームを9個並べたゲームです。
+      小さな9つの○×ゲームで勝ちを取り合い、
+      大きな盤面で縦・横・斜めのいずれかで3つ並べた方が勝ちになります。
     </p>
 
     <p>
-      小さい盤面を勝つと、
-      その盤面を獲得します。
+      小さな盤面で先に自分のマークを縦・横・斜めのいずれかで3つ並べると、
+      その盤面の勝者となり自分の大きなマークを置きます。
     </p>
-
-    <p>
-      大盤面で縦・横・斜めに
-      3つ揃えると勝利です。
-    </p>
-
+    
     <button id="closeRuleBtn">
       閉じる
     </button>

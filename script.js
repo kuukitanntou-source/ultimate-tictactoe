@@ -94,6 +94,68 @@
           aiLevel
         );
 
+        let startingSide = turnOrder;
+
+        if (startingSide === "random") {
+
+          startingSide =
+            Math.random() < 0.5
+              ? "first"
+              : "second";
+
+        }
+
+        if (startingSide === "second") {
+
+          currentPlayer = "×";
+
+          statusText.textContent =
+            currentPlayer + " の番";
+
+          isAiThinking = true;
+
+          setTimeout(() => {
+
+            aiMove();
+
+            isAiThinking = false;
+
+          }, 500);
+
+        }
+
+      }
+    );
+
+	});
+
+	document
+	  .querySelectorAll(
+	    ".turn-order-btn"
+	  )
+	  .forEach(button => {
+
+	    button.addEventListener(
+	      "click",
+	      () => {
+
+        turnOrder =
+          button.dataset.order;
+
+	 document
+          .querySelectorAll(
+            ".turn-order-btn"
+          )
+          .forEach(b =>
+            b.classList.remove(
+              "selected-turn-order"
+            )
+          );
+
+        button.classList.add(
+          "selected-turn-order"
+        );
+
       }
     );
 
@@ -278,7 +340,14 @@ document
 
     let aiLevel = "normal";
 
+    // AI対戦の先攻/後攻設定 ("first" | "second" | "random")
+    let turnOrder = "first";
+
     let gameOver = false;
+
+    // AI対戦時、プレイヤーの着手からAIの着手完了までの
+    // 入力を防ぐためのロックフラグ
+    let isAiThinking = false;
 
 	function applyVolume() {
 
@@ -408,6 +477,10 @@ document
 
        cell.addEventListener("click", () => {
 
+  	if (isAiThinking) {
+  	  return;
+  	}
+
   	unlockAudioContext();
 
   	if (cell.innerHTML !== "") {
@@ -457,9 +530,13 @@ document
 	    currentPlayer === "×"
 	  ) {
 
+	    isAiThinking = true;
+
 	    setTimeout(() => {
 
 	      aiMove();
+
+	      isAiThinking = false;
 
 	    }, 500);
 
@@ -1163,6 +1240,9 @@ document
 
 	function aiMoveEasy() {
 
+	  const boards =
+	    document.querySelectorAll(".small-board");
+
 	  const cells =
 	    document.querySelectorAll(".cell");
 
@@ -1181,6 +1261,81 @@ document
 
 	  if (emptyCells.length === 0) {
 	    return;
+	  }
+
+	  // 小盤面内で指定プレイヤーが即座に揃えられるマスを探す
+	  // (Easy専用: その場で完成する手だけを見る簡易チェックで、
+	  //  先読みやフォークの検出は行わない)
+	  function findImmediateWin(player) {
+
+	    for (let board of boards) {
+
+	      if (
+	        board.classList.contains("won") ||
+	        board.classList.contains("draw-board")
+	      ) {
+	        continue;
+	      }
+
+	      const boardCells =
+	        board.querySelectorAll(".cell");
+
+	      for (let pattern of winPatterns) {
+
+	        const [a, b, c] = pattern;
+
+	        const line = [
+	          boardCells[a],
+	          boardCells[b],
+	          boardCells[c]
+	        ];
+
+	        const playerCount =
+	          line.filter(
+	            cell => cell.dataset.player === player
+	          ).length;
+
+	        const emptyCell =
+	          line.find(
+	            cell => !cell.dataset.player
+	          );
+
+	        if (playerCount === 2 && emptyCell) {
+	          return emptyCell;
+	        }
+
+	      }
+
+	    }
+
+	    return null;
+
+	  }
+
+	  // 簡単さを保つため、勝ち・防御に必ず気づくわけではなく
+	  // ある程度の確率でしか気づかないようにする
+	  const noticeChance = 0.9;
+
+	  if (Math.random() < noticeChance) {
+
+	    const winningCell = findImmediateWin("×");
+
+	    if (winningCell) {
+	      aiPlace(winningCell);
+	      return;
+	    }
+
+	  }
+
+	  if (Math.random() < noticeChance) {
+
+	    const blockingCell = findImmediateWin("〇");
+
+	    if (blockingCell) {
+	      aiPlace(blockingCell);
+	      return;
+	    }
+
 	  }
 
 	  const randomCell =
@@ -1298,6 +1453,22 @@ document
 
 	}
 
+	// その手が、勝敗に関係なく小盤面を引き分けで
+	// 確定させるだけの手かどうかを判定する
+	// (evaluateHardMoveは勝ち・防御・フォークの判定を
+	//  すべて素通りした手にしか呼ばれないため、
+	//  残り1マスを埋める = ただ引き分けにするだけの手)
+	function isUselessDrawMove(boardCells) {
+
+	  const emptyCount =
+	    Array.from(boardCells).filter(
+	      c => !c.dataset.player
+	    ).length;
+
+	  return emptyCount === 1;
+
+	}
+
 	// 相手が次に狙ってきそうな盤面ほど高いスコアを返す
 	// (勝敗に直結しない場面で、先回りして妨害するための評価)
 	function evaluateOpponentTargetValue(boardIndex, boardCells) {
@@ -1339,6 +1510,12 @@ document
 	    cell.boardIndex,
 	    boardCells
 	  );
+
+	  if (isUselessDrawMove(boardCells)) {
+
+	    score -= 50;
+
+	  }
 
 	  return score;
 
@@ -1599,10 +1776,22 @@ document
 
 		}
 
-		if (blockBoards.length > 0) {
+		// 引き分け確定(残り1マス)の盤面は
+		// 防いでも意味が無いので防御対象から除外する
+		const validBlockBoards =
+		  blockBoards.filter(index => {
+
+		    const targetBoardCells =
+		      boards[index].querySelectorAll(".cell");
+
+		    return !isUselessDrawMove(targetBoardCells);
+
+		  });
+
+		if (validBlockBoards.length > 0) {
 
 		  const boardIndex =
-		    blockBoards[0];
+		    validBlockBoards[0];
 
 		  const boardCells =
 		    emptyCells.filter(
