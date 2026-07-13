@@ -1314,7 +1314,7 @@ document
 
 	  // 簡単さを保つため、勝ち・防御に必ず気づくわけではなく
 	  // ある程度の確率でしか気づかないようにする
-	  const noticeChance = 0.9;
+	  const noticeChance = 0.8;
 
 	  if (Math.random() < noticeChance) {
 

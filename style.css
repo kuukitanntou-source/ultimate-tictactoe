@@ -667,7 +667,7 @@
 	  justify-content: center;
 	  align-items: flex-start;
 
-	  padding-top: 100px;
+	  padding-top: clamp(12px, 8dvh, 100px);
 
 	  z-index: 9999;
 
@@ -680,15 +680,15 @@
 
 	  background: white;
 
-	  padding: 25px;
+	  padding: clamp(16px, 5dvh, 25px) clamp(14px, 4vw, 26px);
 
 	  border-radius: 15px;
 
 	  text-align: center;
 
-	  width: 80%;
+	  width: min(90vw, 420px);
 
-	  max-width: 320px;
+	  max-width: 420px;
 
 	  box-sizing: border-box;
 
@@ -699,15 +699,17 @@
 
  	  position: fixed;
 
- 	  top: 20px;
+ 	  top: clamp(12px, 8dvh, 100px);
 
 	}
 
 	#winMessage {
 
-	  font-size: 27px;
+	  font-size: clamp(20px, 7vw, 32px);
 
-	  margin-bottom: 20px;
+	  margin-bottom: clamp(10px, 3dvh, 20px);
+
+	  white-space: nowrap;
 
 	}
 
@@ -716,13 +718,13 @@
 
 	  display: block;
 
-	  margin: 10px auto;
+	  margin: clamp(6px, 2dvh, 10px) auto;
 
-	  width: 180px;
+	  width: clamp(100px, 34vw, 140px);
 
-	height: 50px;
+	height: clamp(32px, 5.2dvh, 42px);
 
-  	font-size: 20px;
+  	font-size: clamp(12px, 2.6vw, 17px);
 	}
 
 	.blue-win {
